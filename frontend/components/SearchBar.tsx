@@ -30,6 +30,8 @@ type SearchBarProps = {
   composers?: SearchComposer[];
   concerts?: SearchConcert[];
   placeholder?: string;
+  value?: string;
+  suggestedQueries?: string[];
   onQueryChange?: (query: string) => void;
   className?: string;
 };
@@ -40,9 +42,13 @@ export default function SearchBar({
   concerts = [],
   placeholder = "Search...",
   onQueryChange,
+  value,
+  suggestedQueries = [],
   className = "",
 }: SearchBarProps) {
-  const [query, setQuery] = useState("");
+  const [internalQuery, setQuery] = useState("");
+  const query = value ?? internalQuery;
+  const inputRef = useRef<HTMLInputElement>(null);
   const [focused, setFocused] = useState(false);
   const searchRef = useRef<HTMLDivElement>(null);
 
@@ -122,6 +128,7 @@ export default function SearchBar({
 
   return (
     <div ref={searchRef} className={`relative ${className}`}>
+      <div className="relative">
       {/* Search input */}
       <div
         className={`relative flex items-center rounded-2xl border bg-white shadow-[0_8px_40px_rgba(0,0,0,0.04)] transition-all duration-300 ${
@@ -145,6 +152,7 @@ export default function SearchBar({
         </motion.span>
 
         <input
+          ref={inputRef}
           type="text"
           value={query}
           onChange={(event) => updateQuery(event.target.value)}
@@ -284,6 +292,25 @@ export default function SearchBar({
           </motion.div>
         )}
       </AnimatePresence>
+      </div>
+      {suggestedQueries.length > 0 && (
+        <div className="mt-4 flex flex-wrap justify-center gap-2 text-xs text-[#aaa69e]">
+          <span>Try</span>
+          {suggestedQueries.map((suggestion) => (
+            <button
+              key={suggestion}
+              type="button"
+              onClick={() => {
+                updateQuery(suggestion);
+                inputRef.current?.focus();
+              }}
+              className="underline decoration-[#d0ccc4] underline-offset-4 transition-colors hover:text-[#444]"
+            >
+              {suggestion}
+            </button>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

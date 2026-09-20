@@ -1,7 +1,28 @@
 "use client";
 
-import { useMemo, useState } from "react";
 import Link from "next/link";
+import SearchBar from "../components/SearchBar";
+import { works } from "./data/works";
+import { concerts as catalogueConcerts, getConcertWorks } from "./data/concerts";
+import { getOrchestra } from "./data/orchestras";
+import { getVenue } from "./data/venues";
+import { composerSlug } from "../lib/composerSlug";
+
+const searchComposers = Array.from(new Map(works.map((work) => [
+  work.composer, { id: composerSlug(work.composer), name: work.composer },
+])).values());
+
+const searchConcerts = catalogueConcerts.map((concert) => {
+  const programme = getConcertWorks(concert);
+  return {
+    id: concert.id,
+    work: programme.map((work) => work.title).join(" / "),
+    composer: Array.from(new Set(programme.map((work) => work.composer))).join(" / "),
+    orchestra: getOrchestra(concert.orchestraId)?.name ?? "",
+    city: getVenue(concert.venueId)?.city ?? "",
+    dateLabel: concert.date,
+  };
+});
 
 type Concert = {
   id: number;
@@ -61,66 +82,7 @@ const concerts: Concert[] = [
   },
 ];
 
-const searchSuggestions = [
-  {
-    type: "Work",
-    title: "Symphony No. 2",
-    subtitle: "Gustav Mahler",
-  },
-  {
-    type: "Work",
-    title: "Symphony No. 5",
-    subtitle: "Jean Sibelius",
-  },
-  {
-    type: "Work",
-    title: "Piano Concerto No. 2",
-    subtitle: "Sergei Rachmaninoff",
-  },
-  {
-    type: "Composer",
-    title: "Gustav Mahler",
-    subtitle: "Composer",
-  },
-  {
-    type: "Orchestra",
-    title: "Vienna Philharmonic",
-    subtitle: "Orchestra",
-  },
-];
-
 export default function Home() {
-  const [query, setQuery] = useState("");
-  const [searchFocused, setSearchFocused] = useState(false);
-
-  const filteredConcerts = useMemo(() => {
-    if (!query.trim()) return [];
-
-    const search = query.toLowerCase();
-
-    return concerts.filter(
-      (concert) =>
-        concert.work.toLowerCase().includes(search) ||
-        concert.composer.toLowerCase().includes(search) ||
-        concert.orchestra.toLowerCase().includes(search) ||
-        concert.city.toLowerCase().includes(search),
-    );
-  }, [query]);
-
-  const filteredSuggestions = useMemo(() => {
-    if (!query.trim()) return searchSuggestions.slice(0, 4);
-
-    const search = query.toLowerCase();
-
-    return searchSuggestions.filter(
-      (suggestion) =>
-        suggestion.title.toLowerCase().includes(search) ||
-        suggestion.subtitle.toLowerCase().includes(search),
-    );
-  }, [query]);
-
-  const showSearchResults = searchFocused || query.length > 0;
-
   return (
     <main className="min-h-screen bg-[#f7f5f0] text-[#202020]">
 
@@ -144,149 +106,14 @@ export default function Home() {
           </p>
         </div>
 
-        {/* Search */}
-        <div className="relative mx-auto mt-12 max-w-2xl text-left">
-          <div
-            className={`relative rounded-2xl border bg-white shadow-[0_8px_40px_rgba(0,0,0,0.04)] transition-all duration-300 ${
-              searchFocused
-                ? "border-[#aaa69e] shadow-[0_12px_50px_rgba(0,0,0,0.08)]"
-                : "border-[#dedbd4]"
-            }`}
-          >
-            <div className="flex items-center px-5">
-              <span
-                className={`mr-3 text-xl transition-transform duration-300 ${
-                  searchFocused ? "scale-110" : ""
-                }`}
-              >
-                ⌕
-              </span>
-
-              <input
-                type="text"
-                value={query}
-                onChange={(event) => setQuery(event.target.value)}
-                onFocus={() => setSearchFocused(true)}
-                onBlur={() => {
-                  // Small delay allows clicking search results.
-                  setTimeout(() => setSearchFocused(false), 150);
-                }}
-                placeholder="Search for a composer, work or orchestra..."
-                className="h-16 flex-1 bg-transparent text-[15px] outline-none placeholder:text-[#aaa69e]"
-              />
-
-              {query && (
-                <button
-                  onClick={() => setQuery("")}
-                  className="flex h-7 w-7 items-center justify-center rounded-full text-sm text-[#999] transition-colors hover:bg-[#eee] hover:text-[#333]"
-                  aria-label="Clear search"
-                >
-                  ×
-                </button>
-              )}
-            </div>
-
-            {/* Search dropdown */}
-            {showSearchResults && (
-              <div className="absolute left-0 right-0 top-[calc(100%+10px)] z-20 overflow-hidden rounded-2xl border border-[#dedbd4] bg-white p-2 shadow-[0_20px_60px_rgba(0,0,0,0.12)] animate-search-dropdown">
-                {query && filteredConcerts.length > 0 ? (
-                  <>
-                    <div className="px-3 pb-2 pt-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#aaa69e]">
-                      Upcoming performances
-                    </div>
-
-                    {filteredConcerts.slice(0, 4).map((concert) => (
-                      <Link
-                        key={concert.id}
-                        href={`/works/${concert.id}`}
-                        className="group flex items-center justify-between rounded-xl px-3 py-3 transition-colors duration-150 hover:bg-[#f5f3ee]"
-                      >
-                        <div>
-                          <p className="text-sm font-medium">
-                            {concert.composer} — {concert.work}
-                          </p>
-                          <p className="mt-1 text-xs text-[#8a877f]">
-                            {concert.orchestra} · {concert.city}
-                          </p>
-                        </div>
-
-                        <span className="translate-x-[-4px] text-[#aaa69e] opacity-0 transition-all duration-200 group-hover:translate-x-0 group-hover:opacity-100">
-                          →
-                        </span>
-                      </Link>
-                    ))}
-                  </>
-                ) : (
-                  <>
-                    <div className="px-3 pb-2 pt-2 text-[11px] font-medium uppercase tracking-[0.15em] text-[#aaa69e]">
-                      {query ? "Suggestions" : "Popular searches"}
-                    </div>
-
-                    {filteredSuggestions.length > 0 ? (
-                      filteredSuggestions.map((suggestion) => (
-                        <button
-                          key={`${suggestion.type}-${suggestion.title}`}
-                          onMouseDown={(event) => event.preventDefault()}
-                          onClick={() => setQuery(suggestion.title)}
-                          className="group flex w-full items-center justify-between rounded-xl px-3 py-3 text-left transition-colors duration-150 hover:bg-[#f5f3ee]"
-                        >
-                          <div>
-                            <p className="text-sm font-medium">
-                              {suggestion.title}
-                            </p>
-                            <p className="mt-1 text-xs text-[#8a877f]">
-                              {suggestion.subtitle}
-                            </p>
-                          </div>
-
-                          <span className="text-[10px] uppercase tracking-wider text-[#aaa69e]">
-                            {suggestion.type}
-                          </span>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-3 py-6 text-center text-sm text-[#8a877f]">
-                        No results found.
-                      </div>
-                    )}
-                  </>
-                )}
-
-                {query && (
-                  <div className="mt-1 border-t border-[#eeeae3] px-3 py-3">
-                    <button className="text-xs text-[#77736b] transition-colors hover:text-[#202020]">
-                      Search everything for “{query}” →
-                    </button>
-                  </div>
-                )}
-              </div>
-            )}
-          </div>
-
-          <div className="mt-4 flex justify-center gap-2 text-xs text-[#aaa69e]">
-            <span>Try</span>
-            <button
-              onClick={() => setQuery("Mahler")}
-              className="underline decoration-[#d0ccc4] underline-offset-4 transition-colors hover:text-[#444]"
-            >
-              Mahler
-            </button>
-            <span>·</span>
-            <button
-              onClick={() => setQuery("Symphony No. 2")}
-              className="underline decoration-[#d0ccc4] underline-offset-4 transition-colors hover:text-[#444]"
-            >
-              Symphony No. 2
-            </button>
-            <span>·</span>
-            <button
-              onClick={() => setQuery("Vienna")}
-              className="underline decoration-[#d0ccc4] underline-offset-4 transition-colors hover:text-[#444]"
-            >
-              Vienna
-            </button>
-          </div>
-        </div>
+        <SearchBar
+          works={works}
+          composers={searchComposers}
+          concerts={searchConcerts}
+          placeholder="Search for a composer, work or orchestra..."
+          suggestedQueries={["Mahler", "Symphony No. 2", "Vienna"]}
+          className="mx-auto mt-12 max-w-2xl text-left"
+        />
       </section>
 
       {/* Explore */}

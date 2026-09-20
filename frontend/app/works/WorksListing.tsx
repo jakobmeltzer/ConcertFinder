@@ -95,6 +95,7 @@ export default function WorksListing({ data }: { data: WorkResponse[] }) {
             works={works}
             composers={composers}
             placeholder="Search for a work or composer..."
+            value={query}
             onQueryChange={setQuery}
           />
         </div>
