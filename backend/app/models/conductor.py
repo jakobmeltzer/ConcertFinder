@@ -4,14 +4,12 @@ from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.database import Base
 
 
-class Orchestra(Base):
-    __tablename__ = "orchestras"
+class Conductor(Base):
+    __tablename__ = "conductors"
 
     id: Mapped[str] = mapped_column(String(150), primary_key=True)
 
     name: Mapped[str] = mapped_column(String(300), nullable=False)
-    city: Mapped[str] = mapped_column(String(150), nullable=False)
-    country: Mapped[str] = mapped_column(String(150), nullable=False)
 
     website: Mapped[str | None] = mapped_column(
         String(500),
@@ -19,5 +17,5 @@ class Orchestra(Base):
     )
 
     concerts: Mapped[list["Concert"]] = relationship(
-        back_populates="orchestra",
+        back_populates="conductor",
     )
