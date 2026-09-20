@@ -44,34 +44,7 @@ export default function ConcertPage({ params }: ConcertPageProps) {
 
   return (
     <main className="min-h-screen bg-[#f7f5f0] text-[#202020]">
-      {/* Navigation */}
-      <header className="border-b border-black/10">
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-5 md:px-10">
-          <Link
-            href="/"
-            className="text-sm font-semibold tracking-tight transition-opacity hover:opacity-60"
-          >
-            ConcertFinder
-          </Link>
 
-          <nav className="flex items-center gap-7 text-sm text-black/60">
-            <Link href="/works" className="transition-colors hover:text-black">
-              Works
-            </Link>
-
-            <Link href="/cities" className="transition-colors hover:text-black">
-              Cities
-            </Link>
-
-            <button
-              aria-label="Explore cities"
-              className="transition-transform duration-300 hover:rotate-12"
-            >
-              ◉
-            </button>
-          </nav>
-        </div>
-      </header>
 
       <div className="mx-auto max-w-7xl px-6 md:px-10">
         {/* Back navigation */}

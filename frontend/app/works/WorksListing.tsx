@@ -68,40 +68,6 @@ export default function WorksListing({ data }: { data: WorkResponse[] }) {
 
   return (
     <main className="min-h-screen bg-[#f7f5f0] text-[#202020]">
-      {/* Navigation */}
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-6 md:px-10">
-        <Link
-          href="/"
-          className="group flex items-center gap-2 text-lg font-medium tracking-tight"
-        >
-          <span className="transition-transform duration-300 group-hover:rotate-[-8deg]">
-            ♫
-          </span>
-          ConcertFinder
-        </Link>
-
-        <div className="hidden items-center gap-8 text-sm md:flex">
-          <Link href="/works" className="text-[#202020]">
-            Works
-          </Link>
-
-          <Link
-            href="/cities"
-            className="text-[#77736b] transition-colors duration-200 hover:text-[#202020]"
-          >
-            Cities
-          </Link>
-
-          <button
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-[#dedbd4] text-base transition-all duration-300 hover:-translate-y-0.5 hover:border-[#202020] hover:bg-[#202020] hover:text-white"
-            aria-label="Explore cities"
-          >
-            ◉
-          </button>
-        </div>
-
-        <button className="text-sm text-[#666] md:hidden">Menu</button>
-      </nav>
 
 
       {/* Header */}
