@@ -381,7 +381,7 @@ export default function Home() {
               </h3>
 
               <p className="mt-3 max-w-sm text-sm leading-6 text-[#85817a]">
-                Discover what's being performed in the world's great music
+                Discover what&apos;s being performed in the world&apos;s great music
                 cities.
               </p>
 

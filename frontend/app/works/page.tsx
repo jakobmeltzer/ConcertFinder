@@ -4,6 +4,8 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import SearchBar from "../../components/SearchBar";
+import { works as canonicalWorks } from "../data/works";
+import { composerSlug } from "../../lib/composerSlug";
 
 type Work = {
   id: string;
@@ -113,6 +115,18 @@ const works: Work[] = [
   },
 ];
 
+const composers = Array.from(
+  new Map(
+    canonicalWorks.map((work) => [
+      work.composer,
+      {
+        id: composerSlug(work.composer),
+        name: work.composer,
+      },
+    ]),
+  ).values(),
+);
+
 const popularComposers = [
   "Gustav Mahler",
   "Ludwig van Beethoven",
@@ -220,6 +234,7 @@ export default function WorksPage() {
         <div className="mt-12">
           <SearchBar
             works={works}
+            composers={composers}
             placeholder="Search for a work or composer..."
             onQueryChange={setQuery}
           />

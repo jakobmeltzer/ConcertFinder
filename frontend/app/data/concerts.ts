@@ -6,8 +6,6 @@ export type ProgrammeItem = {
 };
 
 export type Concert = {
-  country: ReactNode;
-  city: ReactNode;
   id: string;
   date: string;
   time: string;
@@ -141,10 +139,10 @@ export const concerts: Concert[] = [
     date: "3 Oct 2026",
     time: "19:30",
 
-    orchestraId: "concertgebouw-orchestra",
+    orchestraId: "royal-concertgebouw-orchestra",
     conductor: "Klaus Mäkelä",
 
-    venueId: "consertgebouw",
+    venueId: "concertgebouw-amsterdam",
 
     programme: [
       {
@@ -170,10 +168,10 @@ export const concerts: Concert[] = [
     date: "4 Oct 2026",
     time: "14:00",
 
-    orchestraId: "concertgebouw-orchestra",
+    orchestraId: "royal-concertgebouw-orchestra",
     conductor: "Klaus Mäkelä",
 
-    venueId: "consertgebouw",
+    venueId: "concertgebouw-amsterdam",
 
     programme: [
       {

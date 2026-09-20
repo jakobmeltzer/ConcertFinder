@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { use } from "react";
 import { getConcert, getConcertWorks } from "../../data/concerts";
+import { getOrchestra } from "../../data/orchestras";
+import { getVenue } from "../../data/venues";
 
 type ConcertPageProps = {
   params: Promise<{ id: string }>;
@@ -37,6 +39,8 @@ export default function ConcertPage({ params }: ConcertPageProps) {
   }
 
   const programme = getConcertWorks(concert);
+  const orchestra = getOrchestra(concert.orchestraId);
+  const venue = getVenue(concert.venueId);
 
   return (
     <main className="min-h-screen bg-[#f7f5f0] text-[#202020]">
@@ -88,7 +92,7 @@ export default function ConcertPage({ params }: ConcertPageProps) {
           <div className="grid gap-14 md:grid-cols-[1fr_320px] md:items-end">
             <div>
               <p className="animate-fade-up text-sm font-medium uppercase tracking-[0.2em] text-black/45">
-                {concert.orchestraId}
+                {orchestra?.name ?? concert.orchestraId}
               </p>
 
               <h1 className="animate-fade-up mt-5 max-w-4xl text-5xl font-medium tracking-[-0.04em] md:text-7xl">
@@ -105,10 +109,12 @@ export default function ConcertPage({ params }: ConcertPageProps) {
                 Venue
               </p>
 
-              <p className="mt-3 text-lg font-medium">{concert.venueId}</p>
+              <p className="mt-3 text-lg font-medium">
+                {venue?.name ?? concert.venueId}
+              </p>
 
               <p className="mt-1 text-sm text-black/50">
-                {concert.city}, {concert.country}
+                {venue?.city}, {venue?.country}
               </p>
             </div>
           </div>
@@ -197,10 +203,12 @@ export default function ConcertPage({ params }: ConcertPageProps) {
                 Venue
               </p>
 
-              <p className="mt-4 text-lg font-medium">{concert.venueId}</p>
+              <p className="mt-4 text-lg font-medium">
+                {venue?.name ?? concert.venueId}
+              </p>
 
               <p className="mt-1 text-sm text-black/50">
-                {concert.city}, {concert.country}
+                {venue?.city}, {venue?.country}
               </p>
             </div>
 
@@ -241,11 +249,11 @@ export default function ConcertPage({ params }: ConcertPageProps) {
               </p>
 
               <h2 className="mt-4 text-3xl font-medium tracking-tight md:text-4xl">
-                {concert.venueId}
+                {venue?.name ?? concert.venueId}
               </h2>
 
               <p className="mt-3 text-base text-black/50">
-                {concert.city}, {concert.country}
+                {venue?.city}, {venue?.country}
               </p>
             </div>
 

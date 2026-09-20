@@ -7,21 +7,12 @@ import { getConcertsForWork } from "../../data/concerts";
 import { getOrchestra } from "../../data/orchestras";
 import { getVenue } from "../../data/venues";
 import StaggeredContent from "../../../components/StaggeredContent";
+import { composerSlug } from "../../../lib/composerSlug";
 import { motion } from "motion/react";
 
 type WorkPageProps = {
   params: Promise<{ id: string }>;
 };
-
-function composerSlug(name: string): string {
-  return name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
 
 export default function WorkPage({ params }: WorkPageProps) {
   const { id } = use(params);

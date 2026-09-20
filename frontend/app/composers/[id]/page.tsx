@@ -9,20 +9,11 @@ import { getConcertsForWork } from "../../data/concerts";
 import { getOrchestra } from "../../data/orchestras";
 import { getVenue } from "../../data/venues";
 import StaggeredContent from "../../../components/StaggeredContent";
+import { composerSlug } from "../../../lib/composerSlug";
 
 type ComposerPageProps = {
   params: Promise<{ id: string }>;
 };
-
-function composerSlug(name: string): string {
-  return name
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .toLowerCase()
-    .replace(/[^a-z0-9\s-]/g, "")
-    .trim()
-    .replace(/\s+/g, "-");
-}
 
 export default function ComposerPage({ params }: ComposerPageProps) {
   const { id } = use(params);
@@ -91,6 +82,13 @@ export default function ComposerPage({ params }: ComposerPageProps) {
           <nav className="flex items-center gap-7 text-sm text-black/60">
             <Link href="/works" className="transition-colors hover:text-black">
               Works
+            </Link>
+
+            <Link
+              href="/composers"
+              className="text-black transition-colors hover:text-black"
+            >
+              Composers
             </Link>
 
             <Link href="/cities" className="transition-colors hover:text-black">
