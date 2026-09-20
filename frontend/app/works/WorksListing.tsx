@@ -222,7 +222,7 @@ export default function WorksListing({ data }: { data: WorkResponse[] }) {
                         >
                           <Link
                             href={`/works/${work.id}`}
-                            className="group flex flex-col gap-4 border-b border-[#e8e5de] py-5 transition-all duration-300 hover:px-3 md:flex-row md:items-center md:justify-between"
+                            className="inverse-hover group flex flex-col gap-4 border-b border-[#e8e5de] py-5 transition-all duration-300 hover:px-3 md:flex-row md:items-center md:justify-between"
                           >
                             <div className="flex min-w-0 items-center gap-5">
                               <span className="hidden text-lg text-[#c0bcb4] transition-transform duration-300 group-hover:translate-x-1 md:block">

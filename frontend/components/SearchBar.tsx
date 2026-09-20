@@ -366,7 +366,7 @@ function SearchResult({
       <Link
         href={href}
         onClick={onClick}
-        className="group flex items-center justify-between rounded-xl px-3 py-3 transition-colors duration-150 hover:bg-[#f5f3ee]"
+        className="inverse-hover group flex items-center justify-between rounded-xl px-3 py-3 transition-colors duration-150 hover:bg-[#f5f3ee]"
       >
         <div className="min-w-0">
           <p className="truncate text-sm font-medium">{title}</p>

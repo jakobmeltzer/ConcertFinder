@@ -174,7 +174,7 @@ export default function ComposerPage({ params }: ComposerPageProps) {
               >
                 <Link
                   href={`/works/${work.id}`}
-                  className="group block border-b border-black/10 py-7 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
+                  className="inverse-hover group block border-b border-black/10 py-7 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
                 >
                   <div className="grid gap-5 md:grid-cols-[100px_1fr_auto] md:items-center">
                     <div>
@@ -256,7 +256,7 @@ export default function ComposerPage({ params }: ComposerPageProps) {
                 >
                   <Link
                     href={`/concerts/${performance.id}`}
-                    className="group block border-b border-black/10 py-7 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
+                    className="inverse-hover group block border-b border-black/10 py-7 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
                   >
                     <div className="grid gap-6 md:grid-cols-[120px_1fr_auto] md:items-center">
                       <div>

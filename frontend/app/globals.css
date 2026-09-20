@@ -71,6 +71,62 @@ button {
   animation: search-dropdown 180ms ease-out both;
 }
 
+/* Shared work, concert, and search-result hover treatment. */
+.inverse-hover {
+  transition: background-color 240ms ease,
+    border-color 240ms ease, padding 240ms ease;
+}
+
+.inverse-hover * {
+  transition: transform 240ms ease;
+}
+
+.inverse-hover:focus-visible {
+  outline: 2px solid var(--foreground);
+  outline-offset: 3px;
+}
+
+.inverse-hover:focus-visible {
+  background-color: var(--foreground);
+  color: var(--background);
+}
+
+.inverse-hover:focus-visible * {
+  color: var(--background);
+}
+
+@media (hover: hover) {
+  .inverse-hover:hover {
+    background-color: var(--foreground);
+    color: var(--background);
+  }
+
+  .inverse-hover:hover * {
+    color: var(--background);
+  }
+}
+
+@keyframes logo-sway {
+  0%, 100% { transform: translateY(0) rotate(0); }
+  30% { transform: translateY(-3px) rotate(-12deg); }
+  65% { transform: translateY(-1px) rotate(8deg); }
+}
+
+.site-logo-note {
+  display: inline-block;
+  transform-origin: center bottom;
+}
+
+@media (hover: hover) {
+  .site-logo:hover .site-logo-note {
+    animation: logo-sway 600ms ease-in-out;
+  }
+}
+
+.site-logo:focus-visible .site-logo-note {
+  animation: logo-sway 600ms ease-in-out;
+}
+
 /* Respect reduced-motion preferences */
 @media (prefers-reduced-motion: reduce) {
   html {

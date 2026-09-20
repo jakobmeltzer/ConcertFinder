@@ -17,11 +17,11 @@ export default function SiteHeader() {
       <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-8 gap-y-4 px-6 py-5 md:px-10">
         <Link
           href="/"
-          className="group flex items-center gap-2 text-lg font-medium tracking-tight"
+          className="site-logo flex items-center gap-2 text-lg font-medium tracking-tight"
         >
           <span
             aria-hidden="true"
-            className="transition-transform duration-300 group-hover:rotate-[-8deg]"
+            className="site-logo-note"
           >
             ♫
           </span>

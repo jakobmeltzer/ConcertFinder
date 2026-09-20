@@ -212,7 +212,7 @@ export default function Home() {
               <Link
                 key={concert.id}
                 href={`/works/${concert.id}`}
-                className="group flex flex-col gap-4 py-6 transition-all duration-300 hover:px-3 md:flex-row md:items-center md:justify-between"
+                className="inverse-hover group flex flex-col gap-4 py-6 transition-all duration-300 hover:px-3 md:flex-row md:items-center md:justify-between"
               >
                 <div className="flex items-center gap-5">
                   <span className="hidden w-5 text-xs text-[#aaa69e] md:block">

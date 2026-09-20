@@ -113,7 +113,7 @@ export default function ConcertPage({ params }: ConcertPageProps) {
                   <Link
                     key={work.id}
                     href={`/works/${work.id}`}
-                    className="group block border-b border-black/10 py-8 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
+                    className="inverse-hover group block border-b border-black/10 py-8 transition-colors duration-300 hover:bg-black/[0.025] md:px-4"
                   >
                     <div className="grid gap-5 md:grid-cols-[50px_1fr_auto] md:items-center">
                       {/* Number */}
@@ -266,7 +266,7 @@ export default function ConcertPage({ params }: ConcertPageProps) {
               <Link
                 key={work.id}
                 href={`/works/${work.id}`}
-                className="group bg-[#f7f5f0] p-7 transition-colors duration-300 hover:bg-white md:p-8"
+                className="inverse-hover group bg-[#f7f5f0] p-7 transition-colors duration-300 hover:bg-white md:p-8"
               >
                 <p className="text-xs uppercase tracking-[0.15em] text-black/35">
                   {work.composer}
