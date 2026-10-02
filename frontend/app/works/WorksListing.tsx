@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import Link from "next/link";
 import SearchBar from "../../components/SearchBar";
-import type { WorkResponse } from "../../lib/api/works";
+import type { WorkResponse } from "../../lib/api/types";
 
 type Work = {
   id: string;

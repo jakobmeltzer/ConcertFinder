@@ -26,7 +26,7 @@ export const concerts: Concert[] = [
   // VIENNA — MAHLER 2
   // ─────────────────────────────────────────────
   {
-    id: "vienna-philharmonic-mahler-2-2026-09-18",
+    id: "vienna-mahler-2-2026-09-18",
 
     date: "18 Sep 2026",
     time: "19:30",
@@ -51,7 +51,7 @@ export const concerts: Concert[] = [
   // VIENNA — MAHLER 2
   // ─────────────────────────────────────────────
   {
-    id: "vienna-philharmonic-mahler-2-2026-09-19",
+    id: "vienna-mahler-2-2026-09-19",
 
     date: "19 Sep 2026",
     time: "19:30",
@@ -76,7 +76,7 @@ export const concerts: Concert[] = [
   // BERLIN — MAHLER 2 + MAHLER 1
   // ─────────────────────────────────────────────
   {
-    id: "berlin-philharmonic-mahler-2-2026-09-27",
+    id: "berlin-mahler-1-2-2026-09-27",
 
     date: "27 Sep 2026",
     time: "20:00",
@@ -105,7 +105,7 @@ export const concerts: Concert[] = [
   // BERLIN — MAHLER 2 + MAHLER 1
   // ─────────────────────────────────────────────
   {
-    id: "berlin-philharmonic-mahler-2-2026-09-28",
+    id: "berlin-mahler-1-2-2026-09-28",
 
     date: "28 Sep 2026",
     time: "20:00",
@@ -134,7 +134,7 @@ export const concerts: Concert[] = [
   // AMSTERDAM — MAHLER 2 + BRUCKNER 7
   // ─────────────────────────────────────────────
   {
-    id: "concertgebouw-mahler-2-2026-10-03",
+    id: "amsterdam-bruckner-7-mahler-2-2026-10-03",
 
     date: "3 Oct 2026",
     time: "19:30",
@@ -163,7 +163,7 @@ export const concerts: Concert[] = [
   // AMSTERDAM — MAHLER 2 + BRUCKNER 7
   // ─────────────────────────────────────────────
   {
-    id: "concertgebouw-mahler-2-2026-10-04",
+    id: "amsterdam-bruckner-7-mahler-2-2026-10-04",
 
     date: "4 Oct 2026",
     time: "14:00",
