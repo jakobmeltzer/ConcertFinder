@@ -35,6 +35,23 @@ class WorkPerformanceResponse(BaseModel):
     conductor: ConductorResponse | None = None
 
 
+class WorkInstrumentResponse(BaseModel):
+    id: str
+    name: str
+    quantity: int | None
+    display_label: str
+
+
+class InstrumentGroupResponse(BaseModel):
+    id: str
+    name: str
+    instruments: list[WorkInstrumentResponse]
+
+
 class WorkDetailResponse(WorkBaseResponse):
     composer: ComposerResponse
     performances: list[WorkPerformanceResponse]
+    about: list[str]
+    instrumentation_summary: str | None
+    instrumentation: list[InstrumentGroupResponse]
+    related_works: list[WorkResponse]

@@ -10,6 +10,8 @@ class ProgrammeWorkResponse(BaseModel):
     id: str
     title: str
     subtitle: str | None = None
+    year: str | None = None
+    duration: str | None = None
     composer: ComposerResponse
 
     model_config = {

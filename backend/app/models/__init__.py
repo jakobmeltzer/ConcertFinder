@@ -15,3 +15,7 @@ __all__ = [
     "Concert",
     "ProgrammeItem",
 ]
+from app.models.instrumentation import InstrumentFamily, Instrument, WorkInstrument
+from app.models.work_relation import WorkRelation
+
+__all__ += ["InstrumentFamily", "Instrument", "WorkInstrument", "WorkRelation"]

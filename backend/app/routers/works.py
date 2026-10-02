@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import Session, joinedload
+from sqlalchemy.orm import Session, joinedload, selectinload
 
 from app.database import get_db
-from app.models import Work, Concert, ProgrammeItem
+from app.models import Work, Concert, ProgrammeItem, WorkInstrument, Instrument, WorkRelation
 from app.schemas import WorkDetailResponse, WorkResponse
 
 
@@ -39,6 +39,8 @@ def get_work(
     work = (
         db.query(Work)
         .options(
+            selectinload(Work.instruments).joinedload(WorkInstrument.instrument).joinedload(Instrument.family),
+            selectinload(Work.related_links).joinedload(WorkRelation.related_work).joinedload(Work.composer),
             # Load the composer
             joinedload(Work.composer),
 
@@ -70,8 +72,9 @@ def get_work(
 
     performances = []
 
-    for programme_item in work.programme_items:
-        concert = programme_item.concert
+    # A work may occur more than once in a programme; return each concert once.
+    concerts = {item.concert.id: item.concert for item in work.programme_items}
+    for concert in sorted(concerts.values(), key=lambda c: (c.date, c.time, c.id)):
 
         performances.append(
             {
@@ -84,7 +87,21 @@ def get_work(
             }
         )
 
+    groups = {}
+    for entry in work.instruments:
+        instrument = entry.instrument
+        family = instrument.family
+        group = groups.setdefault(family.id, {"id": family.id, "name": family.name, "instruments": []})
+        group["instruments"].append({
+            "id": instrument.id, "name": instrument.name,
+            "quantity": entry.quantity, "display_label": entry.display_label,
+        })
+
     return {
+        "about": work.about,
+        "instrumentation_summary": work.instrumentation_summary,
+        "instrumentation": list(groups.values()),
+        "related_works": [link.related_work for link in work.related_links],
         "id": work.id,
         "title": work.title,
         "subtitle": work.subtitle,

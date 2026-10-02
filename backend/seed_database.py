@@ -1,6 +1,7 @@
 from datetime import date, time
 
 from app.database import SessionLocal
+from seed_work_metadata import seed_work_metadata
 from app.models import (
     Composer,
     Work,
@@ -337,6 +338,8 @@ def seed_database():
 
         db.add_all(programme_items)
 
+        db.flush()
+        seed_work_metadata(db)
         db.commit()
 
         print("Database seeded successfully!")
