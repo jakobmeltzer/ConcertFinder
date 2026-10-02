@@ -19,3 +19,5 @@ from app.models.instrumentation import InstrumentFamily, Instrument, WorkInstrum
 from app.models.work_relation import WorkRelation
 
 __all__ += ["InstrumentFamily", "Instrument", "WorkInstrument", "WorkRelation"]
+from app.models.ingestion_alias import IngestionAlias
+__all__ += ["IngestionAlias"]

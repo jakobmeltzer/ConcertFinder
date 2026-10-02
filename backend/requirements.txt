@@ -2,3 +2,6 @@ sqlalchemy
 psycopg2-binary
 fastapi
 uvicorn
+
+beautifulsoup4
+openai>=1.68.0,<3

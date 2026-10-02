@@ -101,3 +101,164 @@ The live ID audit found no orphaned programme/related-work references or tied
 programme positions. Future ingestion still needs source-ID deduplication,
 immutable assigned-ID/upsert rules, programme-order validation and timezone/unknown
 field policy. The current stored primary/foreign keys need no redesign.
+
+## Ingestion stage 1: Vienna Philharmonic dry run
+
+The first ingestion adapter is intentionally read-only. Source-specific code returns
+`RawConcert` records and has no dependency on SQLAlchemy models or a database
+session. No canonical rows are created by this stage.
+
+Install the new parser dependency, then run a small live dry run from `backend/`:
+
+```sh
+.venv/bin/pip install -r requirements.txt
+.venv/bin/python -m app.ingestion.sources.vienna_philharmonic --limit 5 --verbose
+```
+
+The command fetches the public English Vienna Philharmonic calendar and up to five
+concert detail pages, waits one second between detail requests, validates each raw
+record, and prints JSON. A non-zero exit code means at least one discovered record
+was rejected. Review this JSON before any database-import layer is implemented.
+
+The source event number in the official detail URL is retained as
+`source_event_id`; source URL and crawl timestamp are also retained. Event times
+are represented as local wall-clock time plus an IANA timezone (`Europe/Vienna`
+for this first source). The current canonical `concerts` table is unchanged in
+stage 1; source identity/timezone persistence belongs to the import migration once
+we have verified live source output.
+
+Parser tests use saved minimal fixtures and never contact the live website:
+
+```sh
+.venv/bin/python -m unittest tests.test_ingestion_vienna -v
+```
+
+The parser prefers schema.org JSON-LD for date/location when present and falls back
+to visible page text. Programme text remains raw (`raw_composer`, `raw_work`): no
+canonical work/composer is guessed at crawl time. If the source markup changes,
+the dry run should reject/omit fields visibly rather than write bad canonical data.
+
+### Vienna crawler live-page parser update
+
+The first live dry-run exposed three source-specific issues that are now guarded by tests:
+
+- event credits are parsed only from `.programm-info.event`, preventing navigation labels such as `Tradition` from being mistaken for the orchestra;
+- programme items are parsed as composer/work pairs from the live `Program` entry and retain source text verbatim;
+- touring concerts no longer default to `Europe/Vienna`. Known city/country pairs resolve to an IANA timezone; unknown timed locations are rejected rather than assigned a guessed timezone.
+
+Crawler-import validation also rejects an empty programme. Ticket URLs are read from the event's `.ticket-link` data attributes when the source exposes one; past events can legitimately have no ticket URL.
+
+## Ingestion Stage 2: canonical resolution and safe import
+
+Stage 2 keeps source extraction separate from canonical database writes. A raw record is first
+resolved against existing orchestras, venues, conductors, composers and works. Normalized exact
+matches and human-approved aliases may resolve automatically; fuzzy similarity is suggestion-only
+and never becomes database truth by itself.
+
+Run the migration first:
+
+```bash
+.venv/bin/python migrate_database.py
+```
+
+Resolve a live Vienna Philharmonic crawl without writing anything:
+
+```bash
+.venv/bin/python -m app.ingestion.cli vienna --limit 5
+```
+
+The command reports each event as `ready-to-import` or `blocked-unresolved`, including fuzzy
+candidate suggestions. A blocked record cannot be imported.
+
+After reviewing an unresolved spelling/title, add a durable alias to an existing canonical entity:
+
+```bash
+.venv/bin/python -m app.ingestion.cli add-alias composer gustav-mahler "Mahler, Gustav" --source vienna-philharmonic
+.venv/bin/python -m app.ingestion.cli add-alias work mahler-symphony-no-1 "Symphony No. 1 in D Major" --source vienna-philharmonic
+```
+
+Aliases never create canonical entities; the target ID must already exist. Once every required
+entity resolves, apply inserts/updates transactionally:
+
+```bash
+.venv/bin/python -m app.ingestion.cli vienna --limit 5 --write
+```
+
+Concert source identity is `(source, source_event_id)`. Re-running the same event plans `skip` when
+nothing canonical changed and `update` when source-backed concert fields/programme changed, rather
+than inserting a duplicate. Programme positions are unique per concert.
+
+## LLM metadata review
+
+Enable source-backed review before canonical resolution with `--llm`. OpenAI is
+the initial provider; the model is configured explicitly. The implementation uses
+the Responses API and [Structured Outputs](https://developers.openai.com/api/docs/guides/structured-outputs).
+
+From `backend/`:
+
+```bash
+.venv/bin/pip install -r requirements.txt
+export OPENAI_API_KEY='your-api-key'
+export INGESTION_LLM_MODEL='your-structured-output-model'
+
+# Review only; no database writes. Report filenames must not already exist.
+.venv/bin/python -m app.ingestion.cli vienna --limit 5 --llm --report /tmp/concert-review.json
+
+# Review a fresh crawl and import records that pass review AND canonical resolution.
+.venv/bin/python -m app.ingestion.cli vienna --limit 5 --llm --write
+```
+
+`--model MODEL` overrides `INGESTION_LLM_MODEL`. `backend/.env.example` lists the
+settings; environment files are not loaded automatically. Keys belong only in the
+backend environment. Commands without `--llm` keep the deterministic pipeline.
+
+The Vienna adapter now retains page text, JSON-LD event data and the ticket URL
+from the same fetched HTML used by the parser. Every parsed concert is reviewed,
+including records whose entity names already match the database. The model checks
+title, local date/time/timezone, venue/city/country, orchestra, conductor, programme
+and ticket link. It may repair extraction errors using quoted source evidence.
+It cannot alter the source ID, source URL or crawl timestamp, create canonical
+entities, save aliases, or enrich work biographies/instrumentation from memory.
+
+The application validates the response schema, verifies exact evidence excerpts,
+checks that text fields and each composer/work occur in their evidence, then runs
+normal ingestion validation and canonical resolution. Dates/times are normalized;
+IANA timezones may be inferred from the explicitly stated location. Evidence
+checks do not prove semantic accuracy: incorrect source information, incomplete
+pages and model mistakes still need human review. This is an additional quality
+check, not a guarantee that all metadata is correct.
+
+Uncertainty, conflicting evidence, unsupported removals, refusals, incomplete
+responses and API errors block that event as `blocked-metadata`. A blocked event
+never falls back to importing the original parser output. Missing canonical
+entities still use the existing `review-vienna` / `add-alias` workflow. The CLI
+exits with code 2 when any event is blocked; other fully resolved events may still
+be imported with `--write`.
+
+JSON output includes the original record and source text, proposed metadata,
+quotes, changes, issues, source SHA-256, model, response ID and prompt version.
+With `--llm --write`, a report is saved automatically under
+`backend/ingestion_reports/` (gitignored), or to `--report PATH`. The file is flushed
+before the database transaction commits; a report records review decisions and
+planned actions, not proof of a successful commit. The path is printed to stderr.
+Review-only runs save a report only when `--report` is supplied. A later `--write`
+command fetches and reviews again; it does not replay the earlier report.
+
+Each event makes one LLM request, with a 45-second timeout per attempt and at most
+two SDK retries for transient failures. Records over 60,000 source characters are
+blocked rather than silently truncated. Start with a small `--limit` to assess
+cost and quality. Requests use `store=False` and send the public page text and
+extracted metadata to OpenAI. No database credentials or API keys enter the prompt.
+
+To add another provider, implement `MetadataReviewer.review(raw) -> ProviderResult`
+in `app/ingestion/llm.py` and supply it to `review_metadata`. New crawlers should
+populate `RawConcert.source_text` from the fetched event page and call the same
+review service before resolution. Parser errors that prevent constructing a
+`RawConcert` still need adapter fixes; this stage reviews successfully parsed
+records, including records that fail subsequent completeness validation.
+
+Offline tests (mock responses, no API key or PostgreSQL required):
+
+```bash
+.venv/bin/python -m unittest tests.test_ingestion_llm tests.test_ingestion_resolution tests.test_ingestion_vienna -v
+```

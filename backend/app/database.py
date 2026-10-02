@@ -7,7 +7,7 @@ DATABASE_URL = "postgresql+psycopg2://localhost/concertfinder"
 
 engine = create_engine(
     DATABASE_URL,
-    echo=True,
+    echo=False,
 )
 
 
